@@ -1,26 +1,20 @@
-# Utiliser la dernière version stable de Node.js
-FROM node:current-bullseye
-
-# Installer les dépendances système
-RUN apt-get update && apt-get install -y \
-    watchman \
-    openjdk-11-jdk \
-    && apt-get clean
+# Utiliser une image de base Node.js
+FROM node:18
 
 # Définir le répertoire de travail
 WORKDIR /app
 
-# Copier uniquement les fichiers nécessaires pour npm install
-COPY package.json package-lock.json ./
+# Copier les fichiers de configuration (package.json, etc.)
+COPY package*.json ./
 
 # Installer les dépendances
 RUN npm install
 
-# Copier les autres fichiers du projet
+# Copier le reste du code source
 COPY . .
 
-# Supprimer les caches inutiles
-RUN rm -rf node_modules/.cache
+# Exposer le port pour Expo
+EXPOSE 19000 19001 19002
 
-# Utiliser la CLI locale d'Expo
+# Démarrer Expo
 CMD ["npx", "expo", "start"]
