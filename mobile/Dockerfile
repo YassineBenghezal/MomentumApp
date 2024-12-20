@@ -1,20 +1,17 @@
-# Utiliser une image de base Node.js
-FROM node:18
+FROM node:18-alpine
 
-# Définir le répertoire de travail
+# Installer Expo CLI et ngrok une seule fois
+RUN npm install -g expo-cli @expo/ngrok
+
+# Copier les fichiers package.json pour installer uniquement les dépendances nécessaires
 WORKDIR /app
-
-# Copier les fichiers de configuration (package.json, etc.)
 COPY package*.json ./
 
-# Installer les dépendances
+# Installer les dépendances locales
 RUN npm install
 
 # Copier le reste du code source
 COPY . .
 
-# Exposer le port pour Expo
-EXPOSE 19000 19001 19002
-
-# Démarrer Expo
-CMD ["npx", "expo", "start"]
+# Commande par défaut pour Expo
+CMD ["npm", "start", "--", "--tunnel"]

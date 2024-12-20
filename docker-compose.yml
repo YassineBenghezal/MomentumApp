@@ -12,6 +12,7 @@ services:
     volumes:
       - ./mobile/src:/app/src:cached
       - metro-cache:/root/.metro # Ajout du volume pour le cache Metro
+    command: npm start -- --tunnel
     stdin_open: true
     tty: true
 
@@ -22,7 +23,9 @@ services:
       - "3000:3000"
     volumes:
       - ./backend:/app
-    command: npm start
+      - /app/node_modules # Préserver les modules Node.js
+    command: npm run dev
+
 
   postgres:
     image: postgres:15

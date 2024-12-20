@@ -5,7 +5,8 @@ import jwt from 'jsonwebtoken';
 
 export const signup = async (req: Request, res: Response): Promise<void> => {
     const { username, password } = req.body;
-
+    console.log('Signup request:', req.body);
+    
     try {
         const hashedPassword = await bcrypt.hash(password, 10);
         const user = await prisma.user.create({
@@ -13,6 +14,8 @@ export const signup = async (req: Request, res: Response): Promise<void> => {
         });
         res.status(201).json({ message: 'Utilisateur créé avec succès !', user });
     } catch (error) {
+        console.log('Signup error:', error);
+        
         res.status(400).json({ message: 'Erreur lors de l’inscription', error });
     }
 };

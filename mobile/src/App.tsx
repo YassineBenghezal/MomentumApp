@@ -4,6 +4,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import HomePage from './pages/Home/HomePage';
 import LoginPage from './pages/Login/LoginPage';
+import SignupPage from './pages/Signup/SignupPage';
 
 const Stack = createNativeStackNavigator();
 
@@ -18,6 +19,7 @@ const App = () => {
             options={{ headerShown: false }}
           />
           <Stack.Screen name="Login" component={LoginPage} />
+          <Stack.Screen name="Signup" component={SignupPage} />
         </Stack.Navigator>
       </NavigationContainer>
     </SafeAreaView>

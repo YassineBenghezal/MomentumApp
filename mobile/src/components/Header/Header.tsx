@@ -1,6 +1,7 @@
 import React from 'react';
 import { SafeAreaView, View, Text, TouchableOpacity, StyleSheet, Platform, StatusBar } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { StackNavigationProp } from '@react-navigation/stack';
 
 interface HeaderProps {
   onMenuPress?: () => void; // Ouvre le menu burger
@@ -9,6 +10,7 @@ interface HeaderProps {
   selectedDate?: string; // Date affichée à côté du menu
   isToday?: boolean; // Indique si la date correspond à aujourd'hui
   onOpenCalendar?: () => void; // Ouvre la modale calendrier
+  navigation?: StackNavigationProp<any>;
 }
 
 const Header: React.FC<HeaderProps> = ({
@@ -37,9 +39,9 @@ const Header: React.FC<HeaderProps> = ({
           </TouchableOpacity>
           {showAuthButton && (
             <TouchableOpacity style={styles.authButton} onPress={onAuthPress}>
-              <Ionicons name="person-outline" size={24} color="#fff" />
+                <Ionicons name="person-outline" size={24} color="#fff" />
             </TouchableOpacity>
-          )}
+            )}
         </View>
       </View>
     </SafeAreaView>

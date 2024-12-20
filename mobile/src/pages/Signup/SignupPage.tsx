@@ -1,29 +1,26 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
-import { login } from '../../api/auth.service';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { signup } from '../../api/auth.service';
+
 import { NavigationProp } from '@react-navigation/native';
 
-const LoginPage = ({ navigation }: { navigation: NavigationProp<any> }) => {
+interface SignupPageProps {
+  navigation: NavigationProp<any>;
+}
+
+const SignupPage: React.FC<SignupPageProps> = ({ navigation }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleLogin = async () => {
+  const handleSignup = async () => {
     setLoading(true);
     try {
-      const data = await login(username, password);
-      Alert.alert('Succès', 'Connexion réussie');
-
-      // Sauvegarde du token dans AsyncStorage
-      await AsyncStorage.setItem('authToken', data.token);
-      console.log('Token sauvegardé :', data.token);
-
-      // Redirection vers la HomePage
-      navigation.navigate('Home');
+      await signup(username, password);
+      Alert.alert('Succès', 'Compte créé avec succès !');
+      navigation.navigate('Login'); // Redirection vers la page de connexion
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Échec de la connexion';
-      Alert.alert('Erreur', errorMessage);
+      Alert.alert('Erreur', (error as Error).message || 'Échec de l’inscription');
     } finally {
       setLoading(false);
     }
@@ -31,7 +28,7 @@ const LoginPage = ({ navigation }: { navigation: NavigationProp<any> }) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Connexion</Text>
+      <Text style={styles.title}>Inscription</Text>
       <TextInput
         placeholder="Nom d'utilisateur"
         value={username}
@@ -45,13 +42,13 @@ const LoginPage = ({ navigation }: { navigation: NavigationProp<any> }) => {
         style={styles.input}
         secureTextEntry
       />
-      <TouchableOpacity style={styles.button} onPress={handleLogin} disabled={loading}>
-        <Text style={styles.buttonText}>{loading ? 'Connexion...' : 'Se connecter'}</Text>
+      <TouchableOpacity style={styles.button} onPress={handleSignup} disabled={loading}>
+        <Text style={styles.buttonText}>{loading ? 'Inscription...' : "S'inscrire"}</Text>
       </TouchableOpacity>
       <Text style={styles.footerText}>
-        Je n'ai pas encore de compte ?{' '}
-        <Text style={styles.link} onPress={() => navigation.navigate('Signup')}>
-          M'inscrire
+        Déjà un compte ?{' '}
+        <Text style={styles.link} onPress={() => navigation.navigate('Login')}>
+          Se connecter
         </Text>
       </Text>
     </View>
@@ -104,4 +101,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default LoginPage;
+export default SignupPage;

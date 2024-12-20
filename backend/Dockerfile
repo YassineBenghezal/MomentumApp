@@ -1,22 +1,20 @@
-# Utiliser la dernière version stable de Node.js
-FROM node:current-bullseye
+# Étape 1 : Utiliser une image Node.js
+FROM node:18
 
-# Installer les dépendances nécessaires (si applicables)
-RUN apt-get update && apt-get install -y \
-    && apt-get clean
-
-# Définir le répertoire de travail
+# Étape 2 : Définir le répertoire de travail
 WORKDIR /app
 
-# Copier les fichiers nécessaires
-COPY package.json package-lock.json ./
+# Étape 3 : Copier les fichiers package.json et package-lock.json
+COPY package*.json ./
+
+# Étape 4 : Installer les dépendances
 RUN npm install
 
-# Copier le reste des fichiers du projet
+# Étape 5 : Copier tout le code source
 COPY . .
 
-# Exposer le port du backend (par exemple, 3000)
-EXPOSE 3000
+# Étape 6 : Compiler TypeScript
+RUN npm run build
 
-# Commande par défaut pour démarrer le backend
+# Étape 7 : Exécuter l'application
 CMD ["npm", "start"]
