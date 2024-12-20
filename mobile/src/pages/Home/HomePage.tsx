@@ -5,7 +5,7 @@ import TaskList from '../../components/TaskList/TaskList';
 import Header from '../../components/Header/Header';
 import BottomNav from '../../components/Navigation/BottomNav';
 
-const HomePage = () => {
+const HomePage = ({ navigation }: { navigation: any }) => {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [isCalendarModalVisible, setIsCalendarModalVisible] = useState(false);
 
@@ -32,7 +32,7 @@ const HomePage = () => {
       <Header
         onMenuPress={handleMenuPress}
         showAuthButton={true}
-        onAuthPress={handleAuthPress}
+        onAuthPress={() => navigation.navigate('Login')}
         selectedDate={selectedDate.toLocaleDateString('fr-FR', {
           day: 'numeric',
           month: 'short',
