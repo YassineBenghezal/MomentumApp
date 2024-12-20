@@ -5,6 +5,7 @@ import authRoutes from './modules/auth/routes/auth.routes';
 import habitsRoutes from './modules/habits/routes/habits.route';
 import userRoutes from './modules/user/routes/user.routes';
 import tasksRoutes from './modules/tasks/routes/task.routes';
+import tasksAndHabitsRoutes from './modules/tasks/routes/tasksAndHabits.route';
 
 dotenv.config();
 
@@ -22,6 +23,7 @@ app.use('/auth', authRoutes);
 app.use('/api/habits', habitsRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/tasks', tasksRoutes);
+app.use('/api/tasks-and-habits', tasksAndHabitsRoutes);
 
 // Démarrage du serveur
 app.listen(PORT, () => {

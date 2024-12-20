@@ -1,10 +1,7 @@
 import { Response } from 'express';
 import { AuthenticatedRequest } from '../../../types/extendedRequest.types';
-import { fetchUserHabits, addHabit } from '../services/habits.service';
-import prisma from '../../../config/prisma.client';
+import * as HabitService from '../services/habits.service';
 
-const xpLevels = [0, 100, 200, 400, 800, 1600];
-// Récupérer les habitudes de l'utilisateur connecté
 export const getHabits = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
         if (!req.user) {
@@ -12,8 +9,7 @@ export const getHabits = async (req: AuthenticatedRequest, res: Response): Promi
             return;
         }
 
-        const userId = req.user.id;
-        const habits = await fetchUserHabits(userId);
+        const habits = await HabitService.fetchUserHabits(req.user.id);
         res.status(200).json(habits);
     } catch (error) {
         console.error('Error fetching habits:', error);
@@ -21,7 +17,6 @@ export const getHabits = async (req: AuthenticatedRequest, res: Response): Promi
     }
 };
 
-// Ajouter une nouvelle habitude pour l'utilisateur connecté
 export const createHabit = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
         if (!req.user) {
@@ -29,23 +24,14 @@ export const createHabit = async (req: AuthenticatedRequest, res: Response): Pro
             return;
         }
 
-        const userId = req.user.id;
-        const habitData = {
-            ...req.body,
-            userId,
-            reminderTime: req.body.reminderTime || null, // Nouveau champ
-        };
-
-        const newHabit = await prisma.habit.create({ data: habitData });
-
-        res.status(201).json(newHabit);
+        const habit = await HabitService.createHabit(req.body, req.user.id);
+        res.status(201).json(habit);
     } catch (error) {
         console.error('Error creating habit:', error);
         res.status(400).json({ message: 'Failed to create habit' });
     }
 };
 
-// Mettre à jour une habitude existante
 export const updateHabit = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
         const { id } = req.params;
@@ -54,27 +40,14 @@ export const updateHabit = async (req: AuthenticatedRequest, res: Response): Pro
             return;
         }
 
-        const userId = req.user.id;
-        const updatedData = req.body;
-
-        const habit = await prisma.habit.updateMany({
-            where: { id: Number(id), userId },
-            data: updatedData,
-        });
-
-        if (habit.count === 0) {
-            res.status(404).json({ message: 'Habit not found or unauthorized' });
-            return;
-        }
-
-        res.status(200).json({ message: 'Habit updated successfully' });
+        const updatedHabit = await HabitService.updateHabit(parseInt(id, 10), req.body, req.user.id);
+        res.status(200).json(updatedHabit);
     } catch (error) {
         console.error('Error updating habit:', error);
         res.status(500).json({ message: 'Error updating habit' });
     }
 };
 
-// Supprimer une habitude existante
 export const deleteHabit = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
         const { id } = req.params;
@@ -83,17 +56,7 @@ export const deleteHabit = async (req: AuthenticatedRequest, res: Response): Pro
             return;
         }
 
-        const userId = req.user.id;
-
-        const habit = await prisma.habit.deleteMany({
-            where: { id: Number(id), userId },
-        });
-
-        if (habit.count === 0) {
-            res.status(404).json({ message: 'Habit not found or unauthorized' });
-            return;
-        }
-
+        await HabitService.deleteHabit(parseInt(id, 10), req.user.id);
         res.status(200).json({ message: 'Habit deleted successfully' });
     } catch (error) {
         console.error('Error deleting habit:', error);
@@ -101,59 +64,19 @@ export const deleteHabit = async (req: AuthenticatedRequest, res: Response): Pro
     }
 };
 
-export const completeHabit = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+export const getVisibleHabits = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+    const { date } = req.query;
+
+    if (!req.user || !date) {
+        res.status(400).json({ error: 'Invalid request. Date is required.' });
+        return;
+    }
+
     try {
-        const { id } = req.params;
-        const userId = req.user?.id;
-
-        if (!userId) {
-            res.status(401).json({ error: "Unauthorized" });
-            return;
-        }
-
-        // Vérifier si l'habitude existe et appartient à l'utilisateur
-        const habit = await prisma.habit.findFirst({
-            where: { id: Number(id), userId },
-        });
-
-        if (!habit) {
-            res.status(404).json({ error: "Habitude non trouvée" });
-            return;
-        }
-
-        // Mettre à jour le statut de l'habitude
-        await prisma.habit.update({
-            where: { id: Number(id) },
-            data: { status: "COMPLETÉ" },
-        });
-
-        // Ajouter 10 XP et mettre à jour le niveau utilisateur
-        const user = await prisma.user.findUnique({
-            where: { id: userId },
-        });
-
-        if (!user) {
-            res.status(404).json({ error: "Utilisateur non trouvé" });
-            return;
-        }
-
-        let newXp = user.xp + 10;
-        let newLevel = user.level;
-
-        if (newXp >= xpLevels[newLevel]) {
-            newLevel += 1;
-        }
-
-        await prisma.user.update({
-            where: { id: userId },
-            data: { xp: newXp, level: newLevel },
-        });
-
-        res.json({ message: "Habitude complétée !", xp: newXp, level: newLevel });
+        const visibleHabits = await HabitService.getVisibleHabits(req.user.id, new Date(date as string));
+        res.status(200).json(visibleHabits);
     } catch (error) {
-        console.error("Error completing habit:", error);
-        res.status(500).json({ error: "Erreur interne" });
+        console.error('Error fetching visible habits:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
     }
 };
-
-
