@@ -5,6 +5,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import HomePage from './pages/Home/HomePage';
 import LoginPage from './pages/Login/LoginPage';
 import SignupPage from './pages/Signup/SignupPage';
+import AddActivityPage from './pages/AddActivity/AddActivityPage';
 
 const Stack = createNativeStackNavigator();
 
@@ -20,6 +21,7 @@ const App = () => {
           />
           <Stack.Screen name="Login" component={LoginPage} />
           <Stack.Screen name="Signup" component={SignupPage} />
+          <Stack.Screen name="AddActivity" component={AddActivityPage} />
         </Stack.Navigator>
       </NavigationContainer>
     </SafeAreaView>

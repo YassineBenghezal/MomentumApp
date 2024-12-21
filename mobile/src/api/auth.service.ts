@@ -1,47 +1,25 @@
 import axios from 'axios';
-import Constants from 'expo-constants';
+import { getAuthBaseURL } from './api.config';
 
-// Configuration de l'instance Axios
-const getBaseURL = () => {
-  if (Constants.manifest2?.extra?.expoGoDebugHost) {
-    return `http://${Constants.manifest2.extra.expoGoDebugHost}:3000/auth`;
-  }
-  if (Constants.manifest?.debuggerHost) {
-    const host = Constants.manifest.debuggerHost.split(':').shift();
-    return `http://${host}:3000/auth`;
-  }
-  // Fallback par défaut
-  return 'http://192.168.48.140:3000/auth'; // Remplacez par votre IP locale
-};
-
-const api = axios.create({
-  baseURL: getBaseURL(),
-});
-
-export const signup = async (username: string, password: string) => {
-  try {
-    const response = await api.post('/signup', { username, password });
-    return response.data;
-  } catch (error) {
-    if (axios.isAxiosError(error)) {
-      throw error.response?.data || error.message;
-    } else {
-      throw error;
-    }
-  }
-};
+const API_URL = getAuthBaseURL();
 
 export const login = async (username: string, password: string) => {
-  try {
-    console.log('Login request:', { username, password });
-    console.log('API:', api.defaults.baseURL);
-    const response = await api.post('/login', { username, password });
+    console.log('API_URL', API_URL);
+    console.log('username', username);
+    console.log('password', password);
+    const response = await axios.post(`${API_URL}/login`, { username, password });
+    console.log('response', response);
+    return response.data; // Retourne le token ou les données de l'utilisateur
+};
+
+export const signup = async (username: string, password: string) => {
+    const response = await axios.post(`${API_URL}/signup`, { username, password });
     return response.data;
-  } catch (error) {
-    if (axios.isAxiosError(error)) {
-      throw error.response?.data || error.message;
-    } else {
-      throw error;
-    }
-  }
+};
+
+export const getUserProfile = async (token: string) => {
+    const response = await axios.get(`${API_URL}/profile`, {
+        headers: { Authorization: `Bearer ${token}` },
+    });
+    return response.data;
 };
