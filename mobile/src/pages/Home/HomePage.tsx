@@ -17,12 +17,9 @@ const HomePage = ({ navigation }: { navigation: any }) => {
 
     const fetchTasksAndHabitsData = async (date: Date) => {
         try {
-            console.log('Fetching tasks and habits for date:', date);
             const formattedDate = date.toISOString().split('T')[0];
-            console.log('Formatted date:', formattedDate);
             
             const token = await AsyncStorage.getItem('authToken');
-            console.log('Token:', token);
             
             if (!token) {
                 Alert.alert('Erreur', 'Vous devez être connecté pour accéder aux données.');
@@ -41,10 +38,6 @@ const HomePage = ({ navigation }: { navigation: any }) => {
         } finally {
             setLoading(false);
         }
-    };
-
-    const handleAddActivity = () => {
-        navigation.navigate('AddActivity'); // Navigue vers l'écran d'ajout
     };
 
     useEffect(() => {
@@ -69,15 +62,15 @@ const HomePage = ({ navigation }: { navigation: any }) => {
     return (
         <SafeAreaView style={styles.safeArea}>
             <Header
-                onMenuPress={handleMenuPress}
+                onMenuPress={() => Alert.alert('Menu', 'Ouvre le menu burger')}
                 showAuthButton={true}
                 onAuthPress={() => navigation.navigate('Login')}
-                selectedDate={selectedDate.toLocaleDateString('fr-FR', {
+                title={selectedDate.toLocaleDateString('fr-FR', {
                     day: 'numeric',
                     month: 'short',
                     year: 'numeric',
                 })}
-                isToday={selectedDate.toDateString() === new Date().toDateString()}
+                showCalendar={true}
                 onOpenCalendar={handleOpenCalendar}
             />
 
@@ -96,10 +89,8 @@ const HomePage = ({ navigation }: { navigation: any }) => {
                     tasks={tasks}
                     habits={habits}
                     date={selectedDate}
-                    onAddPress={() => navigation.navigate('AddActivity')}
                 />
             </View>
-            <BottomNav />
         </SafeAreaView>
     );
 };
@@ -107,7 +98,7 @@ const HomePage = ({ navigation }: { navigation: any }) => {
 const styles = StyleSheet.create({
     safeArea: {
         flex: 1,
-        backgroundColor: '#000',
+        backgroundColor: '#000', // Couleur uniforme
         paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight || 0 : 0,
     },
     calendarContainer: {
@@ -115,13 +106,16 @@ const styles = StyleSheet.create({
     },
     content: {
         flex: 1,
-        padding: 10,
+        paddingHorizontal: 20, // Uniformiser le padding
+        paddingVertical: 10,
+        backgroundColor: '#ffffff', // Ajout d'un fond pour le contenu
+        borderRadius: 10,
     },
     loading: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        color: '#fff',
+        color: '#333', // Harmonisation des couleurs
         fontSize: 16,
     },
     error: {

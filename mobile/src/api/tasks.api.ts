@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { getBaseURL } from './api.config';
+import { Task } from '../types/task.types';
 
 const API_URL = getBaseURL();
 
@@ -10,9 +11,14 @@ export const createTask = async (taskData: any, token: string) => {
     return response.data;
 };
 
-export const fetchTasksByDate = async (date: string, token: string) => {
-    const response = await axios.get(`${API_URL}/tasks?date=${date}`, {
-        headers: { Authorization: `Bearer ${token}` },
-    });
-    return response.data;
+export const fetchTasks = async (token: string): Promise<Task []> => {
+    try {
+        const response = await axios.get(`${API_URL}/tasks`, {
+            headers: { Authorization: `Bearer ${token}` },
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Erreur lors de la récupération des tâches :', error);
+        throw error;
+    }
 };

@@ -7,10 +7,9 @@ type Props = {
     tasks: any[];
     habits: any[];
     date: Date;
-    onAddPress: () => void;
 };
 
-const TaskAndHabitView: React.FC<Props> = ({ tasks, habits, date, onAddPress }) => {
+const TaskAndHabitView: React.FC<Props> = ({ tasks, habits, date }) => {
     const isEmpty = tasks.length === 0 && habits.length === 0;
 
     return (
@@ -30,11 +29,6 @@ const TaskAndHabitView: React.FC<Props> = ({ tasks, habits, date, onAddPress }) 
                     <HabitList habits={habits} />
                 </>
             )}
-
-            {/* Bouton pour ajouter des activités */}
-            <TouchableOpacity style={styles.addButton} onPress={onAddPress}>
-                <Text style={styles.addButtonText}>+</Text>
-            </TouchableOpacity>
         </View>
     );
 };
@@ -65,26 +59,7 @@ const styles = StyleSheet.create({
     emptySubtitle: {
         fontSize: 14,
         color: '#666',
-    },
-    addButton: {
-        position: 'absolute',
-        bottom: 20,
-        right: 20,
-        width: 60,
-        height: 60,
-        backgroundColor: '#00bcd4',
-        justifyContent: 'center',
-        alignItems: 'center',
-        borderRadius: 30,
-        shadowColor: '#000',
-        shadowOpacity: 0.1,
-        shadowRadius: 5,
-    },
-    addButtonText: {
-        fontSize: 24,
-        color: '#fff',
-        fontWeight: 'bold',
-    },
+    }
 });
 
 export default TaskAndHabitView;
