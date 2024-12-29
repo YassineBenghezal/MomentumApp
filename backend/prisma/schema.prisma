@@ -22,9 +22,11 @@ model User {
 }
 
 enum Frequency {
-  daily
-  weekly
-  monthly
+  DAILY // Fréquence quotidienne
+  WEEKLY // Jours spécifiques de la semaine
+  MONTHLY // Jours spécifiques du mois
+  YEARLY // Jours spécifiques de l'année
+  CUSTOM // Nombre de fois sur une période définie
 }
 
 enum Status {
@@ -40,35 +42,51 @@ enum Priority {
 }
 
 enum Category {
-  SPORTS
-  FINANCES
-  SANTÉ
-  AUTRE
+  WORK
+  PERSONAL
+  HEALTH
+  FINANCE
+  OTHER
+}
+
+enum CompletionMode {
+  BINARY
+  NUMERIC
 }
 
 model Habit {
-  id            Int             @id @default(autoincrement())
-  name          String
-  description   String?
-  category      Category        @default(AUTRE)
-  frequency     Frequency // Enum : daily, weekly, monthly
-  occurrences   Int? // Nombre d'occurrences souhaitées dans la période (null = illimité)
-  days          String[]        @default([]) // ["1", "3"] pour lundi, mercredi si hebdomadaire
-  customDays    DateTime[]      @default([]) // Dates spécifiques si l'habitude n'est pas récurrente
-  startDate     DateTime // Date de début de l'habitude
-  endDate       DateTime? // Date de fin optionnelle
-  userId        Int
-  user          User            @relation(fields: [userId], references: [id])
-  createdAt     DateTime        @default(now())
-  updatedAt     DateTime        @updatedAt
-  HabitTracking HabitTracking[]
+  id             Int            @id @default(autoincrement())
+  name           String
+  description    String?
+  category       Category
+  frequency      Frequency
+  startDate      DateTime
+  endDate        DateTime?
+  completionMode CompletionMode
+  unit           String?
+
+  // Jours spécifiques
+  daysOfWeek  String[] // Jours spécifiques de la semaine
+  daysOfMonth String[] // Jours spécifiques du mois
+  daysOfYear  DaysOfYear[] // Jours spécifiques de l'année
+
+  // Période pour CUSTOM
+  occurrences Int? // Nombre de répétitions
+  period      String? // Période de référence (week, month, year)
+
+  reminderTime String?
+  tracking     HabitTracking[] // Suivi des habitudes
+  userId       Int
+  user         User            @relation(fields: [userId], references: [id])
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
 }
 
 model Task {
   id          Int      @id @default(autoincrement())
   title       String
   description String?
-  category    Category @default(AUTRE)
+  category    Category @default(OTHER)
   priority    Priority @default(MEDIUM)
   deadline    DateTime
   completed   Boolean  @default(false)
@@ -80,14 +98,22 @@ model Task {
   user User @relation(fields: [userId], references: [id])
 }
 
-model HabitTracking {
-  id            Int       @id @default(autoincrement())
-  date          DateTime // Date où l'habitude est validée
-  lastTrackedAt DateTime?
-  habitId       Int
-  userId        Int
-  createdAt     DateTime  @default(now())
+model DaysOfYear {
+  id      Int   @id @default(autoincrement())
+  habitId Int
+  habit   Habit @relation(fields: [habitId], references: [id], onDelete: Cascade)
+  month   Int // Mois (1-12)
+  day     Int // Jour (1-31)
+}
 
-  user  User  @relation(fields: [userId], references: [id])
-  habit Habit @relation(fields: [habitId], references: [id])
+model HabitTracking {
+  id        Int      @id @default(autoincrement())
+  habitId   Int
+  date      DateTime
+  completed Boolean
+  value     Float?
+
+  habit  Habit @relation(fields: [habitId], references: [id])
+  User   User? @relation(fields: [userId], references: [id])
+  userId Int?
 }

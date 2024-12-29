@@ -24,13 +24,17 @@ export const deleteHabit = async (id: number, userId: number) => {
 };
 
 export const getVisibleHabits = async (userId: number, date: Date) => {
-    const dayOfWeek = date.getDay();
-    const currentDate = date.toISOString();
+    const dayOfWeek = date.getDay(); // Numéro du jour de la semaine (0-6)
+    const dayOfMonth = date.getDate(); // Numéro du jour dans le mois
+    const currentDate = date.toISOString().split('T')[0]; // YYYY-MM-DD
 
-    const habits = await HabitRepository.getHabitsForDate(userId, dayOfWeek, date.getDate(), currentDate);
+    console.log(`Fetching habits for userId: ${userId}, date: ${currentDate}`);
 
-    const trackedHabits = await HabitRepository.getTrackedHabitsForDate(userId, currentDate);
-    const trackedIds = trackedHabits.map((tracking) => tracking.habitId);
+    // Récupère toutes les habitudes actives pour la date
+    const habits = await HabitRepository.getHabitsForDate(userId, dayOfWeek, dayOfMonth, currentDate);
+    console.log(`Found active habits: ${habits.length}`);
 
-    return habits.filter((habit) => !trackedIds.includes(habit.id));
+    // Retourne directement toutes les habitudes actives
+    return habits;
 };
+

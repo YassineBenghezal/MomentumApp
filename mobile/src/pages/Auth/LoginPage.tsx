@@ -20,7 +20,7 @@ const LoginPage = ({ navigation }: { navigation: NavigationProp<any> }) => {
       console.log('Token sauvegardé :', data.token);
 
       // Redirection vers la HomePage
-      navigation.navigate('Home');
+      navigation.navigate('MainTabs');
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Échec de la connexion';
       Alert.alert('Erreur', errorMessage);
