@@ -38,3 +38,7 @@ export const getVisibleHabits = async (userId: number, date: Date) => {
     return habits;
 };
 
+export const trackHabit = async (habitId: number, userId: number, date: Date, value?: number) => {
+    return HabitRepository.trackHabit(habitId, userId, date, value);
+};
+

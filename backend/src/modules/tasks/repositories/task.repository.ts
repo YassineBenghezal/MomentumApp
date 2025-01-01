@@ -29,35 +29,32 @@ export const getTasksByDate = async (userId: number, date: Date) => {
     const endOfDay = new Date(date);
     endOfDay.setHours(23, 59, 59, 999);
 
-    // Vérifie si la date sélectionnée est aujourd’hui ou une date passée
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    const isTodayOrPast = startOfDay.getTime() <= today.getTime();
-
     return prisma.task.findMany({
         where: {
             userId,
             OR: [
+                // Tâches non complétées dont la deadline est aujourd'hui ou dans le passé
                 {
-                    deadline: {
-                        gte: startOfDay,
-                        lt: endOfDay, // Tâches pour la journée
-                    },
+                    completed: false,
+                    deadline: { lte: endOfDay },
                 },
-                // Tâches en retard uniquement si la date est aujourd’hui ou passée
-                ...(isTodayOrPast
-                    ? [
-                          {
-                              completed: false,
-                              deadline: {
-                                  lt: startOfDay, // Tâches en retard avant le début de la journée demandée
-                              },
-                          },
-                      ]
-                    : []),
+                // Tâches complétées uniquement pour la date de leur complétion
+                {
+                    completed: true,
+                    completedAt: { gte: startOfDay, lte: endOfDay },
+                },
             ],
         },
-        orderBy: { deadline: 'asc' },
+    });
+};
+
+export const toggleTaskInRepository = async (taskId: number, userId: number, completedAt?: Date) => {
+    const completedDate = completedAt || new Date();
+    return prisma.task.update({
+        where: { id: taskId, userId },
+        data: {
+            completed: true,
+            completedAt: completedDate,
+        },
     });
 };

@@ -11,6 +11,5 @@ export const fetchTasksAndHabits = async (date: string, token: string) => {
         },
         params: { date },
     });
-    console.log('Data:', response.data);
     return response.data;
 };

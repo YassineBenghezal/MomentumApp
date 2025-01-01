@@ -92,17 +92,31 @@ export const getHabitsForDate = async (userId: number, dayOfWeek: number, dayOfM
         },
         include: {
             daysOfYear: true, // Inclure les jours spécifiques de l'année
+            tracking: {
+                where: { date: { gte: startOfDay, lte: endOfDay } },
+            },
         },
     });
 };
 
 export const trackHabit = async (habitId: number, userId: number, date: Date, value?: number) => {
-    return prisma.habitTracking.create({
-        data: {
+    return prisma.habitTracking.upsert({
+        where: {
+            habitId_date_userId: {
+                habitId,
+                date: date.toISOString(),
+                userId,
+            },
+        },
+        update: {
+            completed: value === undefined,
+            value: value ?? null,
+        },
+        create: {
             habitId,
             userId,
-            date,
-            completed: value !== undefined ? false : true,
+            date: date.toISOString(),
+            completed: value === undefined,
             value: value ?? null,
         },
     });

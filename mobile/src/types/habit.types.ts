@@ -1,4 +1,4 @@
-export type Category = 'WORK' | 'PERSONAL' | 'HEALTH' | 'FINANCE' | 'OTHER';
+export type Category = 'ART' | 'TASK' | 'MEDITATION' | 'STUDIES' | 'SPORTS' | 'ENTERTAINMENT' | 'SOCIAL' | 'FINANCES' | 'HEALTH' | 'WORK' | 'FOOD' | 'HOME' | 'OUTDOORS' | 'OTHER';
 export type Frequency = 'DAILY' | 'WEEKLY' | 'MONTHLY' | 'YEARLY' | 'CUSTOM';
 
 export type Habit = {
@@ -19,4 +19,15 @@ export type Habit = {
     createdAt: string; // Date de création (format ISO)
     updatedAt: string; // Dernière mise à jour (format ISO)
     userId: number; // Référence à l'utilisateur propriétaire
+    tracking: Tracking[];
+};
+
+export type Tracking = {
+    id: number; // Identifiant unique
+    date: string; // Date de suivi (format ISO)
+    completed: boolean; // Indicateur si l'habitude a été complétée
+    value?: number; // Valeur numérique (optionnelle)
+    habitId: number; // Référence à l'habitude associée
+    createdAt: string; // Date de création (format ISO)
+    updatedAt: string; // Dernière mise à jour (format ISO)
 };

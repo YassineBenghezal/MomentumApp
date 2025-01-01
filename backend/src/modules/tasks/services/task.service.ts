@@ -26,3 +26,7 @@ export const deleteTask = async (id: number, userId: number) => {
         throw new Error('Task not found or unauthorized');
     }
 };
+
+export const toggleTask = async (taskId: number, userId: number, completedAt: Date) => {
+    return TaskRepository.toggleTaskInRepository(taskId, userId, completedAt);
+};

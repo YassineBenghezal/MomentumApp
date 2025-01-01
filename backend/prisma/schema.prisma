@@ -42,10 +42,19 @@ enum Priority {
 }
 
 enum Category {
-  WORK
-  PERSONAL
+  ART
+  TASK
+  MEDITATION
+  STUDIES
+  SPORTS
+  ENTERTAINMENT
+  SOCIAL
+  FINANCES
   HEALTH
-  FINANCE
+  WORK
+  FOOD
+  HOME
+  OUTDOORS
   OTHER
 }
 
@@ -83,17 +92,18 @@ model Habit {
 }
 
 model Task {
-  id          Int      @id @default(autoincrement())
+  id          Int       @id @default(autoincrement())
   title       String
   description String?
-  category    Category @default(OTHER)
-  priority    Priority @default(MEDIUM)
+  category    Category  @default(OTHER)
+  priority    Priority  @default(MEDIUM)
   deadline    DateTime
-  completed   Boolean  @default(false)
-  archived    Boolean  @default(false)
+  completed   Boolean   @default(false)
+  completedAt DateTime? // Date de complétion
+  archived    Boolean   @default(false)
   userId      Int
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 
   user User @relation(fields: [userId], references: [id])
 }
@@ -109,11 +119,13 @@ model DaysOfYear {
 model HabitTracking {
   id        Int      @id @default(autoincrement())
   habitId   Int
+  userId    Int?
   date      DateTime
   completed Boolean
   value     Float?
 
-  habit  Habit @relation(fields: [habitId], references: [id])
-  User   User? @relation(fields: [userId], references: [id])
-  userId Int?
+  habit Habit @relation(fields: [habitId], references: [id])
+  User  User? @relation(fields: [userId], references: [id])
+
+  @@unique([habitId, date, userId]) // Contrainte unique
 }

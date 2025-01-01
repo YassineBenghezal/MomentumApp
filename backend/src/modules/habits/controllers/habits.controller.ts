@@ -80,3 +80,21 @@ export const getVisibleHabits = async (req: AuthenticatedRequest, res: Response)
         res.status(500).json({ error: 'Internal Server Error' });
     }
 };
+
+export const trackHabitCompletion = async (req: AuthenticatedRequest, res: Response) => {
+    const { id } = req.params;
+    const { date, value } = req.body; // `value` est optionnel
+
+    if (!req.user || !date) {
+        res.status(400).json({ error: 'Invalid request. Date is required.' });
+        return;
+    }
+
+    try {
+        const tracking = await HabitService.trackHabit(Number(id), req.user.id, new Date(date), value);
+        res.status(200).json(tracking);
+    } catch (error) {
+        console.error('Error tracking habit:', error);
+        res.status(500).json({ message: 'Failed to track habit' });
+    }
+};

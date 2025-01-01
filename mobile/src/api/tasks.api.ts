@@ -22,3 +22,19 @@ export const fetchTasks = async (token: string): Promise<Task []> => {
         throw error;
     }
 };
+
+export const toggleTaskComplete = async (taskId: number, token: string, completedAt?: string): Promise<Task> => {
+    try {
+        const response = await axios.patch(
+            `${API_URL}/tasks/${taskId}/toggle-completion`,
+            { date: completedAt },
+            {
+                headers: { Authorization: `Bearer ${token}` },
+            }
+        );
+        return response.data;
+    } catch (error) {
+        console.error('Failed to toggle task completion:', error);
+        throw error;
+    }
+};

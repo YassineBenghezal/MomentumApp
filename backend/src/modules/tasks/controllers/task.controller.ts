@@ -63,3 +63,27 @@ export const deleteTask = async (req: AuthenticatedRequest, res: Response): Prom
         res.status(500).json({ message: 'Error deleting task' });
     }
 };
+
+export const toggleTaskCompletion = async (req: AuthenticatedRequest, res: Response) => {
+    const { id } = req.params;
+    const { date } = req.body;
+    const userId = req.user?.id;
+
+    if (!userId) {
+        res.status(401).json({ message: 'Unauthorized' });
+        return;
+    }
+
+    try {
+        const task = await TaskService.toggleTask(Number(id), userId, date);
+
+        if (!task) {
+            res.status(404).json({ message: 'Task not found' });
+        }
+
+        res.status(200).json(task);
+    } catch (error) {
+        console.error('Error toggling task completion:', error);
+        res.status(500).json({ message: 'Failed to toggle task completion' });
+    }
+};

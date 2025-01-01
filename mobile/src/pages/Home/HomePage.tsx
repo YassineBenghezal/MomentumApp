@@ -3,14 +3,15 @@ import { SafeAreaView, View, StyleSheet, StatusBar, Alert, Platform, Text } from
 import CalendarView from '../../components/Calendar/CalendarView';
 import TaskAndHabitView from '../../components/TaskList/TaskAndHabitView';
 import Header from '../../components/Header/Header';
-import BottomNav from '../../components/Navigation/BottomNav';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { fetchTasksAndHabits } from '../../api/tasksAndHabits.api';
+import { Task } from '../../types/task.types';
+import { Habit } from '../../types/habit.types';
 
 const HomePage = ({ navigation }: { navigation: any }) => {
     const [selectedDate, setSelectedDate] = useState(new Date());
-    const [tasks, setTasks] = useState([]);
-    const [habits, setHabits] = useState([]);
+    const [tasks, setTasks] = useState<Task[]>([]);
+    const [habits, setHabits] = useState<Habit[]>([]);
     const [isCalendarModalVisible, setIsCalendarModalVisible] = useState(false);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -89,6 +90,8 @@ const HomePage = ({ navigation }: { navigation: any }) => {
                     tasks={tasks}
                     habits={habits}
                     date={selectedDate}
+                    setTasks={setTasks}
+                    setHabits={setHabits}
                 />
             </View>
         </SafeAreaView>

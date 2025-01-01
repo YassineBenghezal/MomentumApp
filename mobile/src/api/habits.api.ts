@@ -22,3 +22,18 @@ export const fetchHabits = async (token: string): Promise<Habit[]> => {
         throw error;
     }
 };
+
+export const trackHabit = async (habitId: number, token: string, date: string, value?: number): Promise<void> => {
+    try {
+        await axios.patch(
+            `${API_URL}/habits/${habitId}/track`,
+            { date, value },
+            {
+                headers: { Authorization: `Bearer ${token}` },
+            }
+        );
+    } catch (error) {
+        console.error('Failed to track habit:', error);
+        throw error;
+    }
+};
