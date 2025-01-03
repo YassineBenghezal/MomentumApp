@@ -98,3 +98,19 @@ export const trackHabitCompletion = async (req: AuthenticatedRequest, res: Respo
         res.status(500).json({ message: 'Failed to track habit' });
     }
 };
+
+export const getHabitStats = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+    try {
+        const { id } = req.params;
+        if (!req.user) {
+            res.status(401).json({ message: 'Unauthorized' });
+            return;
+        }
+
+        const { stats, tracking } = await HabitService.getHabitStats(parseInt(id, 10), req.user.id);
+        res.status(200).json({ stats, tracking });
+    } catch (error) {
+        console.error('Error fetching habit stats:', error);
+        res.status(500).json({ message: 'Failed to fetch habit stats' });
+    }
+};

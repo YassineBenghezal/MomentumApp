@@ -27,6 +27,6 @@ export const deleteTask = async (id: number, userId: number) => {
     }
 };
 
-export const toggleTask = async (taskId: number, userId: number, completedAt: Date) => {
-    return TaskRepository.toggleTaskInRepository(taskId, userId, completedAt);
+export const toggleTask = async (taskId: number, completedAt: Date) => {
+    return TaskRepository.toggleTaskCompletion(taskId, completedAt);
 };

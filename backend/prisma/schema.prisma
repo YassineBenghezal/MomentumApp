@@ -69,8 +69,8 @@ model Habit {
   description    String?
   category       Category
   frequency      Frequency
-  startDate      DateTime
-  endDate        DateTime?
+  startDate      DateTime @db.Date
+  endDate        DateTime?  @db.Date
   completionMode CompletionMode
   unit           String?
 
@@ -97,9 +97,9 @@ model Task {
   description String?
   category    Category  @default(OTHER)
   priority    Priority  @default(MEDIUM)
-  deadline    DateTime
+  deadline    DateTime  @db.Date
   completed   Boolean   @default(false)
-  completedAt DateTime? // Date de complétion
+  completedAt DateTime? @db.Date
   archived    Boolean   @default(false)
   userId      Int
   createdAt   DateTime  @default(now())
@@ -120,7 +120,7 @@ model HabitTracking {
   id        Int      @id @default(autoincrement())
   habitId   Int
   userId    Int?
-  date      DateTime
+  date      DateTime @db.Date
   completed Boolean
   value     Float?
 

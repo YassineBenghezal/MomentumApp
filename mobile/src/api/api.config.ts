@@ -10,7 +10,7 @@ export const getAuthBaseURL = () => {
         return `http://${host}:3000/auth`;
     }
     // Fallback par défaut
-    return 'http://192.168.1.84:3000/auth'; // Remplace par ton IP locale si nécessaire
+    return 'http://192.168.1.43:3000/auth'; // Remplace par ton IP locale si nécessaire
 };
 
 // URL pour les autres endpoints
@@ -23,5 +23,5 @@ export const getBaseURL = () => {
         return `http://${host}:3000/api`;
     }
     // Fallback par défaut
-    return 'http://192.168.1.84:3000/api'; // Remplace par ton IP locale si nécessaire
+    return 'http://192.168.1.43:3000/api'; // Remplace par ton IP locale si nécessaire
 };

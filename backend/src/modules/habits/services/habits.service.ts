@@ -24,21 +24,30 @@ export const deleteHabit = async (id: number, userId: number) => {
 };
 
 export const getVisibleHabits = async (userId: number, date: Date) => {
-    const dayOfWeek = date.getDay(); // Numéro du jour de la semaine (0-6)
+    const dayOfWeek = (date.getDay() + 6) % 7; // Numéro du jour de la semaine (0-6)
+    console.log('dayOfWeek', dayOfWeek);
+    
     const dayOfMonth = date.getDate(); // Numéro du jour dans le mois
     const currentDate = date.toISOString().split('T')[0]; // YYYY-MM-DD
 
-    console.log(`Fetching habits for userId: ${userId}, date: ${currentDate}`);
-
     // Récupère toutes les habitudes actives pour la date
     const habits = await HabitRepository.getHabitsForDate(userId, dayOfWeek, dayOfMonth, currentDate);
-    console.log(`Found active habits: ${habits.length}`);
 
     // Retourne directement toutes les habitudes actives
     return habits;
 };
 
 export const trackHabit = async (habitId: number, userId: number, date: Date, value?: number) => {
-    return HabitRepository.trackHabit(habitId, userId, date, value);
+    return HabitRepository.toggleHabitCompletion(habitId, userId, date, value);
+};
+
+export const getHabitStats = async (habitId: number, userId: number) => {
+    const habit = await HabitRepository.getHabitById(habitId, userId);
+    if (!habit) {
+        throw new Error('Habit not found or unauthorized');
+    }
+
+    const stats = await HabitRepository.calculateHabitStats(habitId, userId);
+    return { stats, tracking: habit.tracking };
 };
 

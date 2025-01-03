@@ -19,6 +19,9 @@ import { NavigationProp } from '@react-navigation/native';
 import { RootStackParamList } from './types/navigation.types';
 import AddHabitPage from './pages/AddHabit/AddHabitPage';
 import AddTaskPage from './pages/AddTask/AddTaskPage';
+import EditTaskPage from './pages/EditTask/EditTaskPage';
+import EditHabitPage from './pages/EditHabit/EditHabitPage';
+import HabitStatsPage from './pages/Habit/HabitStatsPage';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator<RootStackParamList>();
@@ -142,9 +145,8 @@ const App = () => {
             <Stack.Navigator screenOptions={{ headerShown: false }}>
                 <Stack.Screen name="Login" component={LoginPage} />
                 <Stack.Screen name="Signup" component={SignupPage} />
-                <Stack.Screen
-                    name="MainTabs"
-                    component={({ navigation }: { navigation: NavigationProp<RootStackParamList> }) => (
+                <Stack.Screen name="MainTabs">
+                    {({ navigation }) => (
                         <>
                             <Tabs setModalVisible={setModalVisible} navigation={navigation} />
                             <ModalWithNavigation
@@ -154,9 +156,12 @@ const App = () => {
                             />
                         </>
                     )}
-                />
+                </Stack.Screen>
                 <Stack.Screen name="AddHabit" component={AddHabitPage} />
                 <Stack.Screen name="AddTask" component={AddTaskPage} />
+                <Stack.Screen name="EditTask" component={EditTaskPage as React.FC} />
+                <Stack.Screen name="EditHabit" component={EditHabitPage as React.FC} />
+                <Stack.Screen name="HabitStats" component={HabitStatsPage} />
             </Stack.Navigator>
         </NavigationContainer>
     );

@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getHabits, createHabit, updateHabit, deleteHabit, getVisibleHabits, trackHabitCompletion } from '../controllers/habits.controller';
+import { getHabits, createHabit, updateHabit, deleteHabit, getVisibleHabits, trackHabitCompletion, getHabitStats } from '../controllers/habits.controller';
 import { authenticateUser } from '../../auth/middlewares/auth.middleware';
 
 const router = Router();
@@ -10,6 +10,6 @@ router.post('/', authenticateUser, createHabit);
 router.put('/:id', authenticateUser, updateHabit);
 router.delete('/:id', authenticateUser, deleteHabit);
 router.patch('/:id/track', authenticateUser, trackHabitCompletion);
-
+router.get('/:id/stats', authenticateUser, getHabitStats);
 
 export default router;

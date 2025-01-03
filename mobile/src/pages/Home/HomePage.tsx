@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { SafeAreaView, View, StyleSheet, StatusBar, Alert, Platform, Text } from 'react-native';
 import CalendarView from '../../components/Calendar/CalendarView';
 import TaskAndHabitView from '../../components/TaskList/TaskAndHabitView';
@@ -7,6 +7,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { fetchTasksAndHabits } from '../../api/tasksAndHabits.api';
 import { Task } from '../../types/task.types';
 import { Habit } from '../../types/habit.types';
+import { useFocusEffect } from '@react-navigation/native';
 
 const HomePage = ({ navigation }: { navigation: any }) => {
     const [selectedDate, setSelectedDate] = useState(new Date());
@@ -29,7 +30,6 @@ const HomePage = ({ navigation }: { navigation: any }) => {
             }
 
             const data = await fetchTasksAndHabits(formattedDate, token);
-            console.log('Data:', data);
             
             setTasks(data.tasks || []);
             setHabits(data.habits || []);
@@ -41,9 +41,35 @@ const HomePage = ({ navigation }: { navigation: any }) => {
         }
     };
 
+    const getFormattedDate = (date: Date) => {
+        const today = new Date();
+        if (
+            date.getDate() === today.getDate() &&
+            date.getMonth() === today.getMonth() &&
+            date.getFullYear() === today.getFullYear()
+        ) {
+            return "Aujourd'hui";
+        }
+        return date.toLocaleDateString('fr-FR', {
+            day: 'numeric',
+            month: 'short',
+            year: 'numeric',
+        });
+    };
+
     useEffect(() => {
         fetchTasksAndHabitsData(selectedDate);
     }, [selectedDate]);
+
+    useEffect(() => {
+        fetchTasksAndHabitsData(new Date());
+    }, []);
+
+    useFocusEffect(
+        useCallback(() => {
+            fetchTasksAndHabitsData(selectedDate);
+        }, [selectedDate])
+    );
 
     const handleMenuPress = () => {
         Alert.alert('Menu', 'Ouvre le menu burger');
@@ -57,6 +83,13 @@ const HomePage = ({ navigation }: { navigation: any }) => {
         setIsCalendarModalVisible(false);
     };
 
+    const handleOpenHabitStats = (habitId: number) => {
+        navigation.navigate('HabitStats', {
+            habitId,
+            onGoBack: () => fetchTasksAndHabitsData(selectedDate),
+        });
+    };
+
     if (loading) return <Text style={styles.loading}>Chargement...</Text>;
     if (error) return <Text style={styles.error}>{error}</Text>;
 
@@ -66,11 +99,7 @@ const HomePage = ({ navigation }: { navigation: any }) => {
                 onMenuPress={() => Alert.alert('Menu', 'Ouvre le menu burger')}
                 showAuthButton={true}
                 onAuthPress={() => navigation.navigate('Login')}
-                title={selectedDate.toLocaleDateString('fr-FR', {
-                    day: 'numeric',
-                    month: 'short',
-                    year: 'numeric',
-                })}
+                title={getFormattedDate(selectedDate)}
                 showCalendar={true}
                 onOpenCalendar={handleOpenCalendar}
             />
@@ -92,6 +121,7 @@ const HomePage = ({ navigation }: { navigation: any }) => {
                     date={selectedDate}
                     setTasks={setTasks}
                     setHabits={setHabits}
+                    onOpenHabitStats={handleOpenHabitStats}
                 />
             </View>
         </SafeAreaView>

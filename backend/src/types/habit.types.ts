@@ -1,4 +1,5 @@
 import { Frequency, Category } from "@prisma/client";
+import { HabitTracking } from "./habitTracking.type";
 
 export interface Habit {
     id: number;
@@ -21,6 +22,7 @@ export interface Habit {
     createdAt: Date;
     updatedAt: Date;
     lastTrackedAt?: Date; // Dernière validation
+    tracking?: HabitTracking[]; // Suivi pour la journée
 }
 
 export type CreateHabitDTO = Omit<Habit, 'id' | 'createdAt' | 'updatedAt' | 'lastTrackedAt'>;

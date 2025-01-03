@@ -1,0 +1,10 @@
+-- AlterTable
+ALTER TABLE "Habit" ALTER COLUMN "endDate" SET DATA TYPE DATE,
+ALTER COLUMN "startDate" SET DATA TYPE DATE;
+
+-- AlterTable
+ALTER TABLE "HabitTracking" ALTER COLUMN "date" SET DATA TYPE DATE;
+
+-- AlterTable
+ALTER TABLE "Task" ALTER COLUMN "deadline" SET DATA TYPE DATE,
+ALTER COLUMN "completedAt" SET DATA TYPE DATE;

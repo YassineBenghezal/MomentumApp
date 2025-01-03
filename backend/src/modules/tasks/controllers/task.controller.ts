@@ -75,7 +75,7 @@ export const toggleTaskCompletion = async (req: AuthenticatedRequest, res: Respo
     }
 
     try {
-        const task = await TaskService.toggleTask(Number(id), userId, date);
+        const task = await TaskService.toggleTask(Number(id), date);
 
         if (!task) {
             res.status(404).json({ message: 'Task not found' });
