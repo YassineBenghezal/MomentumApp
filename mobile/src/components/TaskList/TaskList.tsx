@@ -4,7 +4,7 @@ import { Task } from '../../types/task.types';
 import { getCategoryColor, getCategoryIcon } from '../../constants/categories';
 import { NavigationProp, useNavigation, useFocusEffect } from '@react-navigation/native';
 import { RootStackParamList } from '../../types/navigation.types';
-import { FontAwesome } from '@expo/vector-icons'; // Import FontAwesome for lock icon
+import { FontAwesome, Ionicons } from '@expo/vector-icons'; // Import FontAwesome for lock icon
 
 type TaskListProps = {
     tasks?: Task[];
@@ -100,24 +100,62 @@ const TaskList: React.FC<TaskListProps> = ({ tasks = [], date, onToggleComplete,
                     onRequestClose={handleCloseModal}
                 >
                     <View style={styles.modalContainer}>
-                        <View style={styles.modalContent}>
-                            <View style={styles.modalHeader}>
-                                <Text style={styles.modalTitle}>{selectedTask.title}</Text>
-                                <TouchableOpacity onPress={handleCloseModal}>
-                                    <Text style={styles.closeIcon}>✖</Text>
-                                </TouchableOpacity>
+                        {/* Bouton pour fermer */}
+                        <TouchableOpacity
+                            onPress={handleCloseModal}
+                            style={styles.floatingCloseButton}
+                        >
+                            <Ionicons name="close" size={30} color="#fff" />
+                        </TouchableOpacity>
+
+                        <View style={styles.modalContentEnhanced}>
+                            {/* Header avec le titre, icône de la catégorie et date */}
+                            <View style={styles.modalHeaderEnhanced}>
+                                <View style={styles.titleContainer}>
+                                    <Text style={styles.modalHabitTitle}>{selectedTask.title}</Text>
+                                    <Text
+                                        style={[
+                                            styles.modalHabitDate,
+                                            { color: getCategoryColor(selectedTask.category) },
+                                        ]}
+                                    >
+                                        {new Date(selectedTask.deadline).toLocaleDateString()}
+                                    </Text>
+                                </View>
+                                <View
+                                    style={[
+                                        styles.modalCategoryIcon,
+                                        { backgroundColor: getCategoryColor(selectedTask.category) },
+                                    ]}
+                                >
+                                    {getCategoryIcon(selectedTask.category, 24)}
+                                </View>
                             </View>
+
+                            {/* Description */}
                             <View style={styles.descriptionSection}>
                                 <Text style={styles.descriptionText}>
                                     {selectedTask.description || 'Aucune description'}
                                 </Text>
                             </View>
-                            <View style={styles.buttonGroup}>
-                                <TouchableOpacity style={styles.modalButton} onPress={() => navigation.navigate('EditTask', { task: selectedTask })}>
-                                    <Text style={styles.buttonText}>Modifier 🛠️</Text>
+
+                            {/* Boutons d'actions */}
+                            <View style={styles.actionContainerColumn}>
+                                <TouchableOpacity
+                                    style={styles.actionLine}
+                                    onPress={() =>
+                                        navigation.navigate('EditTask', { task: selectedTask })
+                                    }
+                                >
+                                    <Ionicons name="create-outline" size={24} color="#fff" />
+                                    <Text style={styles.actionText}>Modifier</Text>
                                 </TouchableOpacity>
-                                <TouchableOpacity style={styles.modalButton} onPress={() => handleDeleteConfirmation(selectedTask.id)}>
-                                    <Text style={styles.buttonText}>Supprimer 🗑️</Text>
+                                <TouchableOpacity
+                                    style={styles.actionLine}
+                                    onPress={() => handleDeleteConfirmation(selectedTask.id)}
+                                >
+                                    <Ionicons name="trash-outline" size={24} color="#fff" />
+                                    <Text style={styles.actionText}>Supprimer</Text>
                                 </TouchableOpacity>
                             </View>
                         </View>
@@ -245,14 +283,6 @@ const styles = StyleSheet.create({
         fontSize: 18,
         color: '#333',
     },
-    descriptionSection: {
-        marginVertical: 10,
-        paddingHorizontal: 10,
-    },
-    descriptionText: {
-        fontSize: 14,
-        color: '#333',
-    },
     statusSection: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -318,6 +348,85 @@ const styles = StyleSheet.create({
         fontSize: 14,
         color: '#555',
     },
+    floatingCloseButton: {
+        position: 'absolute',
+        top: '2%',
+        right: '5%',
+        backgroundColor: '#444',
+        padding: 10,
+        borderRadius: 20,
+        zIndex: 10,
+    },
+    
+    modalHeaderEnhanced: {
+        width: '100%',
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        marginBottom: 20,
+    },
+    
+    titleContainer: {
+        flex: 1, // Permet au titre de prendre l'espace restant
+        paddingRight: 10, // Évite que le titre touche l'icône
+    },
+    
+    modalHabitTitle: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        color: '#fff',
+        marginBottom: 5,
+    },
+    
+    modalHabitDate: {
+        fontSize: 14,
+        color: '#aaa',
+    },
+    
+    modalCategoryIcon: {
+        width: 40,
+        height: 40,
+        borderRadius: 20,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    
+    descriptionSection: {
+        marginBottom: 20,
+        paddingHorizontal: 10,
+    },
+    
+    descriptionText: {
+        fontSize: 14,
+        color: '#aaa',
+    },
+    
+    actionContainerColumn: {
+        width: '100%',
+        flexDirection: 'column',
+        marginVertical: 10,
+    },
+    
+    actionLine: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingVertical: 10,
+        borderBottomWidth: 1,
+        borderBottomColor: '#444',
+    },
+    
+    actionText: {
+        marginLeft: 15,
+        color: '#fff',
+        fontSize: 16,
+    }, 
+    modalContentEnhanced: {
+        width: '90%',
+        backgroundColor: '#1E1E1E',
+        borderRadius: 15,
+        padding: 20,
+        alignItems: 'center',
+    },    
 });
 
 export default TaskList;

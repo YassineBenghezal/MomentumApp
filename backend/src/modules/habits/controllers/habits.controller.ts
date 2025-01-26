@@ -107,8 +107,8 @@ export const getHabitStats = async (req: AuthenticatedRequest, res: Response): P
             return;
         }
 
-        const { stats, tracking } = await HabitService.getHabitStats(parseInt(id, 10), req.user.id);
-        res.status(200).json({ stats, tracking });
+        const { stats, tracking, currentStreak, bestStreak } = await HabitService.getHabitStats(parseInt(id, 10), req.user.id);
+        res.status(200).json({ stats, tracking, currentStreak, bestStreak });
     } catch (error) {
         console.error('Error fetching habit stats:', error);
         res.status(500).json({ message: 'Failed to fetch habit stats' });

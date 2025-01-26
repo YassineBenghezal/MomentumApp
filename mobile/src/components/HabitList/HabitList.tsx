@@ -92,6 +92,11 @@ const HabitList: React.FC<HabitListProps> = ({ habits, onToggleComplete, onEditH
         }
     };
 
+    const handleOpenHabitStats = (habitId: number) => {
+        setEditModalVisible(false); // Ferme la modale
+        onOpenHabitStats(habitId);
+    };
+
     return (
         <ScrollView style={styles.listContainer} contentContainerStyle={styles.contentContainer}>
             {habits.map((habit) => {
@@ -145,44 +150,16 @@ const HabitList: React.FC<HabitListProps> = ({ habits, onToggleComplete, onEditH
                     </TouchableOpacity>
                 );
             })}
-
             {selectedHabit && (
-                <Modal
-                    transparent={true}
-                    animationType="slide"
+                <HabitModal
+                    habit={selectedHabit}
                     visible={editModalVisible}
-                    onRequestClose={handleCloseEditModal}
-                >
-                    <View style={styles.modalContainer}>
-                        <View style={styles.modalContent}>
-                            <View style={styles.modalHeader}>
-                                <Text style={styles.modalTitle}>{selectedHabit.name}</Text>
-                                <TouchableOpacity onPress={handleCloseEditModal}>
-                                    <Text style={styles.closeIcon}>✖</Text>
-                                </TouchableOpacity>
-                            </View>
-                            <View style={styles.descriptionSection}>
-                                <Text style={styles.descriptionText}>
-                                    {selectedHabit.description || 'Aucune description'}
-                                </Text>
-                            </View>
-                            <View style={styles.buttonGroup}>
-                                <TouchableOpacity style={styles.modalButton} onPress={() => navigation.navigate('EditHabit', { habit: selectedHabit })}>
-                                    <Text style={styles.buttonText}>Modifier 🛠️</Text>
-                                </TouchableOpacity>
-                                <TouchableOpacity style={styles.modalButton} onPress={() => handleDeleteConfirmation(selectedHabit.id)}>
-                                    <Text style={styles.buttonText}>Supprimer 🗑️</Text>
-                                </TouchableOpacity>
-                                <TouchableOpacity style={styles.modalButton} onPress={() => onOpenHabitStats(selectedHabit.id)}>
-                                    <Ionicons name="stats-chart" size={20} color="#fff" />
-                                    <Text style={styles.buttonText}>Statistiques 📊</Text>
-                                </TouchableOpacity>
-                            </View>
-                        </View>
-                    </View>
-                </Modal>
+                    onClose={handleCloseEditModal}
+                    onEdit={() => navigation.navigate('EditHabit', { habit: selectedHabit })}
+                    onDelete={() => handleDeleteConfirmation(selectedHabit.id)}
+                    onOpenStats={() => handleOpenHabitStats(selectedHabit.id)}
+                />
             )}
-
             {confirmDeleteVisible && (
                 <Modal
                     transparent={true}
@@ -206,7 +183,6 @@ const HabitList: React.FC<HabitListProps> = ({ habits, onToggleComplete, onEditH
                     </View>
                 </Modal>
             )}
-
             {selectedHabit && selectedHabit.completionMode === 'NUMERIC' && (
                 <Modal
                     transparent={true}
@@ -263,6 +239,82 @@ const HabitList: React.FC<HabitListProps> = ({ habits, onToggleComplete, onEditH
         </ScrollView>
     );
 };
+
+export const HabitModal: React.FC<{
+    habit: Habit;
+    visible: boolean;
+    onClose: () => void;
+    onEdit: () => void;
+    onDelete: () => void;
+    onOpenStats: () => void;
+}> = ({ habit, visible, onClose, onEdit, onDelete, onOpenStats }) => (
+    <Modal
+        transparent={true}
+        animationType="slide"
+        visible={visible}
+        onRequestClose={onClose}
+    >
+        <View style={styles.modalContainer}>
+            <TouchableOpacity
+                onPress={onClose}
+                style={styles.floatingCloseButton}
+            >
+                <Ionicons name="close" size={30} color="#fff" />
+            </TouchableOpacity>
+            <View style={styles.modalContentEnhanced}>
+                <View style={styles.modalHeaderEnhanced}>
+                    <View style={styles.titleContainer}>
+                        <Text style={styles.modalHabitTitle}>{habit.name}</Text>
+                        <Text
+                            style={[
+                                styles.modalHabitDate,
+                                { color: getCategoryColor(habit.category) },
+                            ]}
+                        >
+                            {new Date(habit.startDate).toLocaleDateString()}
+                        </Text>
+                    </View>
+                    <View
+                        style={[
+                            styles.modalCategoryIcon,
+                            { backgroundColor: getCategoryColor(habit.category) },
+                        ]}
+                    >
+                        {getCategoryIcon(habit.category, 24)}
+                    </View>
+                </View>
+                <View style={styles.descriptionSection}>
+                    <Text style={styles.descriptionText}>
+                        {habit.description || 'Aucune description'}
+                    </Text>
+                </View>
+                <View style={styles.actionContainerColumn}>
+                    <TouchableOpacity
+                        style={styles.actionLine}
+                        onPress={onOpenStats}
+                    >
+                        <Ionicons name="stats-chart" size={24} color="#fff" />
+                        <Text style={styles.actionText}>Statistiques</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                        style={styles.actionLine}
+                        onPress={onEdit}
+                    >
+                        <Ionicons name="create-outline" size={24} color="#fff" />
+                        <Text style={styles.actionText}>Modifier</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                        style={styles.actionLine}
+                        onPress={onDelete}
+                    >
+                        <Ionicons name="trash-outline" size={24} color="#fff" />
+                        <Text style={styles.actionText}>Supprimer</Text>
+                    </TouchableOpacity>
+                </View>
+            </View>
+        </View>
+    </Modal>
+);
 
 const styles = StyleSheet.create({
     listContainer: {
@@ -357,14 +409,6 @@ const styles = StyleSheet.create({
         fontSize: 18,
         color: '#333',
     },
-    descriptionSection: {
-        marginVertical: 10,
-        paddingHorizontal: 10,
-    },
-    descriptionText: {
-        fontSize: 14,
-        color: '#333',
-    },
     statusSection: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -422,9 +466,6 @@ const styles = StyleSheet.create({
         flexDirection: 'row', // Add this line to align icon and text
         justifyContent: 'center', // Add this line to center icon and text
     },
-    deleteButton: {
-        backgroundColor: '#FF0000',
-    },
     buttonText: {
         color: '#fff',
         fontSize: 16,
@@ -435,10 +476,6 @@ const styles = StyleSheet.create({
         alignSelf: 'center',
         backgroundColor: '#ddd',
         borderRadius: 5,
-    },
-    closeButtonText: {
-        fontSize: 16,
-        color: '#333',
     },
     modalTitle: {
         fontSize: 18,
@@ -469,6 +506,107 @@ const styles = StyleSheet.create({
         fontSize: 14,
         color: '#555',
     },
+    modalContentEnhanced: {
+        width: '90%',
+        backgroundColor: '#1E1E1E',
+        borderRadius: 15,
+        padding: 20,
+        alignItems: 'center',
+    },    
+    descriptionSection: {
+        marginBottom: 20,
+        paddingHorizontal: 10,
+    },
+    
+    descriptionText: {
+        fontSize: 14,
+        color: '#aaa',
+    }, 
+    actionButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'flex-start',
+        backgroundColor: '#333',
+        padding: 15,
+        marginVertical: 5,
+        borderRadius: 10,
+    },
+    deleteButton: {
+        backgroundColor: '#FF0000',
+    },
+    closeButtonEnhanced: {
+        marginTop: 20,
+        backgroundColor: '#444',
+        padding: 10,
+        borderRadius: 10,
+        alignItems: 'center',
+    },
+    
+    closeButtonText: {
+        fontSize: 16,
+        color: '#fff',
+    },
+    floatingCloseButton: {
+        position: 'absolute',
+        top: '2%',
+        right: '5%',
+        backgroundColor: '#444',
+        padding: 10,
+        borderRadius: 20,
+        zIndex: 10,
+    },
+    actionContainerColumn: {
+        width: '100%',
+        flexDirection: 'column',
+        marginVertical: 10,
+    },
+    
+    actionLine: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingVertical: 10,
+        borderBottomWidth: 1,
+        borderBottomColor: '#444',
+    },
+    
+    actionText: {
+        marginLeft: 15,
+        color: '#fff',
+        fontSize: 16,
+    },  
+    modalHeaderEnhanced: {
+        width: '100%',
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        marginBottom: 20,
+    },
+    
+    titleContainer: {
+        flex: 1, // Permet au titre de prendre l'espace restant
+        paddingRight: 10, // Évite que le titre touche l'icône
+    },
+    
+    modalHabitTitle: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        color: '#fff',
+        marginBottom: 5,
+    },
+    
+    modalHabitDate: {
+        fontSize: 14,
+        color: '#aaa',
+    },
+    
+    modalCategoryIcon: {
+        width: 40,
+        height: 40,
+        borderRadius: 20,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+       
 });
 
 export default HabitList;

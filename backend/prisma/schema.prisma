@@ -76,7 +76,7 @@ model Habit {
 
   // Jours spécifiques
   daysOfWeek  String[] // Jours spécifiques de la semaine
-  daysOfMonth String[] // Jours spécifiques du mois
+  daysOfMonth String[] // Jours spécifiques du mois, y compris "Dernier"
   daysOfYear  DaysOfYear[] // Jours spécifiques de l'année
 
   // Période pour CUSTOM
@@ -124,7 +124,7 @@ model HabitTracking {
   completed Boolean
   value     Float?
 
-  habit Habit @relation(fields: [habitId], references: [id])
+  habit Habit @relation(fields: [habitId], references: [id], onDelete: Cascade)
   User  User? @relation(fields: [userId], references: [id])
 
   @@unique([habitId, date, userId]) // Contrainte unique

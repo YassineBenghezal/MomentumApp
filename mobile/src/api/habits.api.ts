@@ -67,7 +67,6 @@ export const fetchHabitStats = async (token: string, habitId: number): Promise<a
         const response = await axios.get(`${API_URL}/habits/${habitId}/stats`, {
             headers: { Authorization: `Bearer ${token}` },
         });
-        console.log('Stats:', response.data);
         
         return response.data;
     } catch (error) {

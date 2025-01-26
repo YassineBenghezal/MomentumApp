@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, StyleSheet, Alert, SafeAreaView, Platform, StatusBar, Modal, TouchableOpacity } from 'react-native';
+import { View, Text, FlatList, StyleSheet, Alert, SafeAreaView, Platform, StatusBar, TouchableOpacity } from 'react-native';
 import { fetchHabits } from '../../api/habits.api'; // Assure-toi d'avoir une fonction API pour récupérer les habitudes
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Habit } from '../../types/habit.types';
@@ -7,6 +7,7 @@ import BottomNav from '../../components/Navigation/BottomNav';
 import Header from '../../components/Header/Header';
 import { NavigationProp, useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from '../../types/navigation.types';
+import { HabitModal } from '../../components/HabitList/HabitList';
 
 const HabitsPage = () => {
     const navigation = useNavigation<NavigationProp<RootStackParamList>>();
@@ -77,30 +78,17 @@ const HabitsPage = () => {
                 />
             </View>
             {selectedHabit && (
-                <Modal
-                    transparent={true}
-                    animationType="slide"
+                <HabitModal
+                    habit={selectedHabit}
                     visible={modalVisible}
-                    onRequestClose={handleCloseModal}
-                >
-                    <View style={styles.modalContainer}>
-                        <View style={styles.modalContent}>
-                            <Text style={styles.modalTitle}>{selectedHabit.name}</Text>
-                            <TouchableOpacity onPress={handleCloseModal}>
-                                <Text style={styles.closeIcon}>✖</Text>
-                            </TouchableOpacity>
-                            <Text style={styles.modalDescription}>{selectedHabit.description}</Text>
-                            <View style={styles.buttonGroup}>
-                                <TouchableOpacity style={styles.modalButton} onPress={() => navigation.navigate('EditHabit', { habit: selectedHabit })}>
-                                    <Text style={styles.buttonText}>Modifier 🛠️</Text>
-                                </TouchableOpacity>
-                                <TouchableOpacity style={styles.modalButton} onPress={handleDeleteHabit}>
-                                    <Text style={styles.buttonText}>Supprimer 🗑️</Text>
-                                </TouchableOpacity>
-                            </View>
-                        </View>
-                    </View>
-                </Modal>
+                    onClose={handleCloseModal}
+                    onEdit={() => navigation.navigate('EditHabit', { habit: selectedHabit })}
+                    onDelete={handleDeleteHabit}
+                    onOpenStats={() => {
+                        handleCloseModal();
+                        navigation.navigate('HabitStats', { habitId: selectedHabit.id, onGoBack: handleCloseModal });
+                    }}
+                />
             )}
         </SafeAreaView>
     );

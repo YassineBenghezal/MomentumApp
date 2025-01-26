@@ -25,8 +25,6 @@ export const deleteHabit = async (id: number, userId: number) => {
 
 export const getVisibleHabits = async (userId: number, date: Date) => {
     const dayOfWeek = (date.getDay() + 6) % 7; // Numéro du jour de la semaine (0-6)
-    console.log('dayOfWeek', dayOfWeek);
-    
     const dayOfMonth = date.getDate(); // Numéro du jour dans le mois
     const currentDate = date.toISOString().split('T')[0]; // YYYY-MM-DD
 
@@ -48,6 +46,7 @@ export const getHabitStats = async (habitId: number, userId: number) => {
     }
 
     const stats = await HabitRepository.calculateHabitStats(habitId, userId);
-    return { stats, tracking: habit.tracking };
+    const streaks = await HabitRepository.calculateStreaks(habitId, userId);
+    return { stats, tracking: habit.tracking, ...streaks };
 };
 
